@@ -11,3 +11,11 @@ This is a non-cryptographic 32-bit hash function designed for high performance a
 - Prime Multiplier: Uses the FNV prime `16777619` for bit distribution.
 - Circular Rotation: Employs bitwise rotation `(h << 13 | h >> 19)` to ensure bits "wrap around" rather than being discarded, maximizing the avalanche effect.
 
+WORKED EXAMPLE
+Plaintext  -  HELLOWORLDPXR 
+Hash - C4D2A1B8
+CombinedH - ELLOWORLDC4D2A1B8
+Grid (R * C) = 5 * 4
+Route Path - Spiral (Clockwise, Inward)
+Final Ciphertext - HELL8B1A2D4CROWOLLDX
+
