@@ -11,7 +11,23 @@ This is a non-cryptographic 32-bit hash function designed for high performance a
 - Prime Multiplier: Uses the FNV prime `16777619` for bit distribution.
 - Circular Rotation: Employs bitwise rotation `(h << 13 | h >> 19)` to ensure bits "wrap around" rather than being discarded, maximizing the avalanche effect.
 
-WORKED EXAMPLE
+WORKED EXAMPLE - 
+
+Plaintext  -  I AM IRONMAN 
+
+Hash - 49C22C9B
+
+Combined - IAMIRONMAN49C22C9B
+
+Grid (R * C) = 5 * 4
+
+Padded String - IAMIRONMAN49C22C9BXX
+
+Route Path - Spiral (Clockwise, Inward)
+
+Final Ciphertext - IAMIM9CXXB9CARON42N2
+
+WORKED EXAMPLE - 2
 
 Plaintext  -  HELLOWORLDPXR 
 
@@ -26,7 +42,7 @@ Route Path - Spiral (Clockwise, Inward)
 Final Ciphertext - HELL8B1A2D4CROWOLLDX
 
 
-Hash Function Explanation
+FNV-Hash Function Explanation
 
 FNV Basis: It uses the constants from the Fowler–Noll–Vo hash to provide a solid foundation for non-cryptographic hashing.
 
