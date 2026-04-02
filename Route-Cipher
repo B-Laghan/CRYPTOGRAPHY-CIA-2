@@ -1,0 +1,105 @@
+import math
+
+def compute_unique_hash(text):
+    """
+    A custom 32-bit hash using a Prime-XOR-Rotate pattern.
+    This provides better 'Avalanche' effect than the previous version.
+    """
+    # Initial seed (Offset Basis)
+    h = 2166136261
+    # Large Prime (FNV Prime)
+    prime = 16777619
+    
+    for i, ch in enumerate(text):
+        # 1. XOR the character and the position index
+        h ^= (ord(ch) + i)
+        # 2. Multiply by the prime
+        h = (h * prime) & 0xFFFFFFFF
+        # 3. Bitwise Rotation (Unique mixing step)
+        # Moves bits to the left and wraps them around to the right
+        h = ((h << 13) | (h >> 19)) & 0xFFFFFFFF
+        
+    # Finalization: Extra bit-scrambling (Xorshift)
+    h ^= (h >> 16)
+    h = (h * 0x85ebca6b) & 0xFFFFFFFF
+    h ^= (h >> 13)
+    
+    return hex(h)[2:].upper().zfill(8)
+
+def get_dimensions(n):
+    if n == 0: return 0, 0
+    r = math.ceil(math.sqrt(n))
+    c = math.ceil(n / r)
+    return r, c
+
+def spiral_read(grid):
+    r, c = len(grid), len(grid[0])
+    res = []
+    top, bot, left, right = 0, r - 1, 0, c - 1
+    while top <= bot and left <= right:
+        for j in range(left, right + 1): res.append(grid[top][j])
+        top += 1
+        for i in range(top, bot + 1): res.append(grid[i][right])
+        right -= 1
+        if top <= bot:
+            for j in range(right, left - 1, -1): res.append(grid[bot][j])
+            bot -= 1
+        if left <= right:
+            for i in range(bot, top - 1, -1): res.append(grid[i][left])
+            left += 1
+    return "".join(res)
+
+def spiral_fill(grid, text):
+    r, c = len(grid), len(grid[0])
+    k, top, bot, left, right = 0, 0, r - 1, 0, c - 1
+    while top <= bot and left <= right:
+        for j in range(left, right + 1):
+            grid[top][j] = text[k]; k += 1
+        top += 1
+        for i in range(top, bot + 1):
+            grid[i][right] = text[k]; k += 1
+        right -= 1
+        if top <= bot:
+            for j in range(right, left - 1, -1):
+                grid[bot][j] = text[k]; k += 1
+            bot -= 1
+        if left <= right:
+            for i in range(bot, top - 1, -1):
+                grid[i][left] = text[k]; k += 1
+            left += 1
+
+def encrypt(text):
+    text = text.replace(" ", "")
+    h = compute_unique_hash(text)
+    combined = text + h
+    r, c = get_dimensions(len(combined))
+    # Pad with 'X' to ensure the grid is perfectly rectangular
+    padded = combined.ljust(r * c, 'X')
+    
+    # Create grid row-by-row
+    grid = [list(padded[i*c : (i+1)*c]) for i in range(r)]
+    return spiral_read(grid)
+
+def decrypt(cipher):
+    r, c = get_dimensions(len(cipher))
+    grid = [[None for _ in range(c)] for _ in range(r)]
+    spiral_fill(grid, cipher)
+    
+    # Read linearly from the reconstructed grid
+    combined = "".join(["".join(row) for row in grid]).rstrip('X')
+    
+    if len(combined) < 8: return combined, False
+    
+    text = combined[:-8]
+    extracted_hash = combined[-8:]
+    valid = (compute_unique_hash(text) == extracted_hash)
+    return text, valid
+
+if __name__ == "__main__":
+    msg = input("Enter text to encrypt: ")
+    cipher = encrypt(msg)
+    print(f"\nEncrypted (Spiral Route): {cipher}")
+    
+    plain, status = decrypt(cipher)
+    print(f"Decrypted Text: {plain}")
+    print(f"Integrity Check: {'SUCCESS' if status else 'FAILED'}")
