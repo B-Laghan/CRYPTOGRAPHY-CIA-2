@@ -25,3 +25,14 @@ Route Path - Spiral (Clockwise, Inward)
 
 Final Ciphertext - HELL8B1A2D4CROWOLLDX
 
+
+Hash Function Explanation
+
+FNV Basis: It uses the constants from the Fowler–Noll–Vo hash to provide a solid foundation for non-cryptographic hashing.
+
+Position Sensitivity: By adding the index i during the XOR step, the hash treats "binary" and "brainy" as completely different inputs, even though they contain the same characters.
+
+Bitwise Rotation: The (h << 13) | (h >> 19) operation prevents "clumping" of data and ensures that the internal state is thoroughly mixed with every character.
+
+Finalizer: The constants used in the finalization step (0x85ebca6b) are borrowed from the MurmurHash3 mixer, which helps pass statistical tests for randomness.
+
