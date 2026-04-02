@@ -1,0 +1,48 @@
+import math
+
+def compute_unique_hash(text):
+    """
+    A custom 32-bit hash function using a Prime-XOR-Rotate pattern.
+    
+    This implementation combines elements of the FNV-1a algorithm with 
+    bitwise rotation and an Xorshift finalizer to ensure high entropy 
+    and a strong 'avalanche effect' (where small input changes result 
+    in significantly different hashes).
+    
+    Args:
+        text (str): The input string to hash.
+        
+    Returns:
+        str: An 8-character uppercase hexadecimal string representing the 32-bit hash.
+    """
+    # Initial seed: FNV offset basis for 32-bit
+    h = 2166136261
+    
+    # Large Prime: FNV prime for 32-bit
+    prime = 16777619
+    
+    for i, ch in enumerate(text):
+        # 1. Mix: XOR the current hash with the character code and its position
+        # Including 'i' helps prevent collisions in anagrams (e.g., "abc" vs "cba")
+        h ^= (ord(ch) + i)
+        
+        # 2. Multiply by the prime and constrain to 32 bits
+        h = (h * prime) & 0xFFFFFFFF
+        
+        # 3. Bitwise Rotation: Circular left shift by 13 bits
+        # This ensures that bits from the low-order positions affect high-order positions
+        h = ((h << 13) | (h >> 19)) & 0xFFFFFFFF
+        
+    # Finalization: Xorshift scrambling to improve distribution
+    h ^= (h >> 16)
+    h = (h * 0x85ebca6b) & 0xFFFFFFFF
+    h ^= (h >> 13)
+    
+    # Return as a padded 8-character hex string
+    return hex(h)[2:].upper().zfill(8)
+
+# Example usage:
+if __name__ == "__main__":
+    sample_text = "Hello World"
+    print(f"Text: {sample_text}")
+    print(f"Hash: {compute_unique_hash(sample_text)}")
